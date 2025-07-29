@@ -339,6 +339,7 @@ const MoleculeStudio = () => {
     let isMouseDown = false;
     let mouseX = 0;
     let mouseY = 0;
+    let lastTouchDistance = 0;
 
     const onMouseDown = (event) => {
       isMouseDown = true;
@@ -363,39 +364,80 @@ const MoleculeStudio = () => {
       mouseY = event.clientY;
     };
 
+    // Helper function to get distance between two touch points
+    const getTouchDistance = (touch1, touch2) => {
+      const dx = touch1.clientX - touch2.clientX;
+      const dy = touch1.clientY - touch2.clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    };
+
     // Touch event handlers for mobile
     const onTouchStart = (event) => {
+      event.preventDefault();
+      
       if (event.touches.length === 1) {
-        event.preventDefault();
+        // Single finger - rotation
         isMouseDown = true;
         mouseX = event.touches[0].clientX;
         mouseY = event.touches[0].clientY;
+      } else if (event.touches.length === 2) {
+        // Two fingers - pinch to zoom
+        isMouseDown = false;
+        lastTouchDistance = getTouchDistance(event.touches[0], event.touches[1]);
       }
     };
 
     const onTouchEnd = (event) => {
       event.preventDefault();
       isMouseDown = false;
+      lastTouchDistance = 0;
     };
 
     const onTouchMove = (event) => {
-      if (!isMouseDown || !moleculeGroupRef.current || event.touches.length !== 1) return;
-      
       event.preventDefault();
-      const deltaX = event.touches[0].clientX - mouseX;
-      const deltaY = event.touches[0].clientY - mouseY;
       
-      moleculeGroupRef.current.rotation.y += deltaX * 0.01;
-      moleculeGroupRef.current.rotation.x += deltaY * 0.01;
-      
-      mouseX = event.touches[0].clientX;
-      mouseY = event.touches[0].clientY;
+      if (event.touches.length === 1 && isMouseDown && moleculeGroupRef.current) {
+        // Single finger - rotation
+        const deltaX = event.touches[0].clientX - mouseX;
+        const deltaY = event.touches[0].clientY - mouseY;
+        
+        moleculeGroupRef.current.rotation.y += deltaX * 0.01;
+        moleculeGroupRef.current.rotation.x += deltaY * 0.01;
+        
+        mouseX = event.touches[0].clientX;
+        mouseY = event.touches[0].clientY;
+      } else if (event.touches.length === 2) {
+        // Two fingers - pinch to zoom
+        const currentTouchDistance = getTouchDistance(event.touches[0], event.touches[1]);
+        
+        if (lastTouchDistance > 0) {
+          const scale = currentTouchDistance / lastTouchDistance;
+          
+          // Apply zoom with limits
+          const currentDistance = camera.position.length();
+          const newDistance = currentDistance / scale;
+          
+          // Set zoom limits
+          if (newDistance > 2 && newDistance < 50) {
+            camera.position.multiplyScalar(1 / scale);
+          }
+        }
+        
+        lastTouchDistance = currentTouchDistance;
+      }
     };
 
     const onWheel = (event) => {
       event.preventDefault();
       const scale = event.deltaY > 0 ? 0.9 : 1.1;
-      camera.position.multiplyScalar(scale);
+      
+      // Apply zoom with limits
+      const currentDistance = camera.position.length();
+      const newDistance = currentDistance * scale;
+      
+      if (newDistance > 2 && newDistance < 50) {
+        camera.position.multiplyScalar(scale);
+      }
     };
 
     // Add mouse event listeners
