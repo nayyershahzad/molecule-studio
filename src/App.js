@@ -335,7 +335,7 @@ const MoleculeStudio = () => {
     directionalLight.castShadow = true;
     scene.add(directionalLight);
 
-    // Controls (mouse interaction)
+    // Controls (mouse and touch interaction)
     let isMouseDown = false;
     let mouseX = 0;
     let mouseY = 0;
@@ -363,16 +363,56 @@ const MoleculeStudio = () => {
       mouseY = event.clientY;
     };
 
+    // Touch event handlers for mobile
+    const onTouchStart = (event) => {
+      if (event.touches.length === 1) {
+        event.preventDefault();
+        isMouseDown = true;
+        mouseX = event.touches[0].clientX;
+        mouseY = event.touches[0].clientY;
+      }
+    };
+
+    const onTouchEnd = (event) => {
+      event.preventDefault();
+      isMouseDown = false;
+    };
+
+    const onTouchMove = (event) => {
+      if (!isMouseDown || !moleculeGroupRef.current || event.touches.length !== 1) return;
+      
+      event.preventDefault();
+      const deltaX = event.touches[0].clientX - mouseX;
+      const deltaY = event.touches[0].clientY - mouseY;
+      
+      moleculeGroupRef.current.rotation.y += deltaX * 0.01;
+      moleculeGroupRef.current.rotation.x += deltaY * 0.01;
+      
+      mouseX = event.touches[0].clientX;
+      mouseY = event.touches[0].clientY;
+    };
+
     const onWheel = (event) => {
       event.preventDefault();
       const scale = event.deltaY > 0 ? 0.9 : 1.1;
       camera.position.multiplyScalar(scale);
     };
 
+    // Add mouse event listeners
     renderer.domElement.addEventListener('mousedown', onMouseDown);
     renderer.domElement.addEventListener('mouseup', onMouseUp);
     renderer.domElement.addEventListener('mousemove', onMouseMove);
     renderer.domElement.addEventListener('wheel', onWheel);
+
+    // Add touch event listeners for mobile
+    renderer.domElement.addEventListener('touchstart', onTouchStart, { passive: false });
+    renderer.domElement.addEventListener('touchend', onTouchEnd, { passive: false });
+    renderer.domElement.addEventListener('touchmove', onTouchMove, { passive: false });
+
+    // Prevent context menu on long press (mobile)
+    renderer.domElement.addEventListener('contextmenu', (event) => {
+      event.preventDefault();
+    });
 
     // Animation loop
     const animate = () => {
@@ -397,6 +437,10 @@ const MoleculeStudio = () => {
       renderer.domElement.removeEventListener('mouseup', onMouseUp);
       renderer.domElement.removeEventListener('mousemove', onMouseMove);
       renderer.domElement.removeEventListener('wheel', onWheel);
+      renderer.domElement.removeEventListener('touchstart', onTouchStart);
+      renderer.domElement.removeEventListener('touchend', onTouchEnd);
+      renderer.domElement.removeEventListener('touchmove', onTouchMove);
+      renderer.domElement.removeEventListener('contextmenu', (event) => event.preventDefault());
     };
   };
 
@@ -577,7 +621,7 @@ const MoleculeStudio = () => {
         </div>
 
         <div className="mt-6 text-sm text-gray-600 text-center">
-          <p>Drag to rotate • Scroll to zoom • Colors follow CPK convention</p>
+          <p>Drag to rotate • Scroll/pinch to zoom • Colors follow CPK convention</p>
         </div>
       </div>
     </div>
