@@ -62,6 +62,8 @@ const MoleculeStudio = () => {
       setIsLoading(true);
       setError('');
       
+      console.log('Fetching data for:', name); // Debug log
+      
       const response = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
         headers: {
@@ -100,11 +102,19 @@ Use realistic 3D coordinates in Angstroms. DO NOT include any text outside the J
         })
       });
 
+      if (!response.ok) {
+        throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+      }
+
       const data = await response.json();
+      console.log('API response:', data); // Debug log
+      
       let responseText = data.content[0].text.trim();
       
       // Clean up any markdown formatting
       responseText = responseText.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+      
+      console.log('Cleaned response:', responseText); // Debug log
       
       const moleculeInfo = JSON.parse(responseText);
       
@@ -117,17 +127,22 @@ Use realistic 3D coordinates in Angstroms. DO NOT include any text outside the J
       }
     } catch (error) {
       console.error('Error fetching molecule data:', error);
-      setError('Failed to fetch molecule data. Please try again.');
+      setError(`Failed to fetch molecule data: ${error.message}. Please try again.`);
       setMoleculeData(null);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleSubmit = (e) => {
-    if (e) e.preventDefault();
+  const handleSubmit = () => {
     if (moleculeName.trim()) {
       fetchMoleculeData(moleculeName.trim());
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSubmit();
     }
   };
 
@@ -347,7 +362,7 @@ Use realistic 3D coordinates in Angstroms. DO NOT include any text outside the J
               type="text"
               value={moleculeName}
               onChange={(e) => setMoleculeName(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSubmit(e)}
+              onKeyPress={handleKeyPress}
               placeholder="Enter molecule name (e.g., water, caffeine, aspirin)"
               className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               disabled={isLoading}
@@ -383,7 +398,7 @@ Use realistic 3D coordinates in Angstroms. DO NOT include any text outside the J
           )}
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden relative">
           <div 
             ref={mountRef} 
             className="w-full h-96 bg-gray-50"
@@ -391,10 +406,19 @@ Use realistic 3D coordinates in Angstroms. DO NOT include any text outside the J
           />
           
           {!moleculeData && !isLoading && (
-            <div className="absolute inset-0 flex items-center justify-center text-gray-500">
+            <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center text-gray-500 pointer-events-none">
               <div className="text-center">
                 <div className="text-6xl mb-4">⚛️</div>
                 <p className="text-lg">Enter a molecule name to begin visualization</p>
+              </div>
+            </div>
+          )}
+          
+          {isLoading && (
+            <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-white bg-opacity-75">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                <p className="text-lg text-gray-600">Fetching molecular data...</p>
               </div>
             </div>
           )}
