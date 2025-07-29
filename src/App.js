@@ -64,59 +64,23 @@ const MoleculeStudio = () => {
       
       console.log('Fetching data for:', name); // Debug log
       
-      const response = await fetch("https://api.anthropic.com/v1/messages", {
+      const response = await fetch("/api/molecule", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
-          max_tokens: 2000,
-          messages: [
-            {
-              role: "user",
-              content: `Provide the 3D molecular structure data for ${name}. Return ONLY a valid JSON object with this exact format:
-
-{
-  "formula": "chemical formula (e.g., H2O)",
-  "atoms": [
-    {
-      "element": "element symbol (e.g., H, C, N, O)",
-      "x": number,
-      "y": number,
-      "z": number
-    }
-  ],
-  "bonds": [
-    {
-      "atom1": index_of_first_atom,
-      "atom2": index_of_second_atom,
-      "order": bond_order (1=single, 2=double, 3=triple)
-    }
-  ]
-}
-
-Use realistic 3D coordinates in Angstroms. DO NOT include any text outside the JSON. If the molecule doesn't exist or you're unsure, return an error object: {"error": "Molecule not found or invalid"}`
-            }
-          ]
+          moleculeName: name
         })
       });
 
       if (!response.ok) {
-        throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+        const errorData = await response.json();
+        throw new Error(errorData.error || `API request failed: ${response.status}`);
       }
 
-      const data = await response.json();
-      console.log('API response:', data); // Debug log
-      
-      let responseText = data.content[0].text.trim();
-      
-      // Clean up any markdown formatting
-      responseText = responseText.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
-      
-      console.log('Cleaned response:', responseText); // Debug log
-      
-      const moleculeInfo = JSON.parse(responseText);
+      const moleculeInfo = await response.json();
+      console.log('API response:', moleculeInfo); // Debug log
       
       if (moleculeInfo.error) {
         setError(moleculeInfo.error);
