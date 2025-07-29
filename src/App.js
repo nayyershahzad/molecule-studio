@@ -57,41 +57,229 @@ const MoleculeStudio = () => {
     'Zn': 1.22,
   };
 
+  // Built-in molecule database
+  const moleculeDatabase = {
+    water: {
+      formula: "H2O",
+      atoms: [
+        { element: "O", x: 0, y: 0, z: 0 },
+        { element: "H", x: 0.76, y: 0.59, z: 0 },
+        { element: "H", x: -0.76, y: 0.59, z: 0 }
+      ],
+      bonds: [
+        { atom1: 0, atom2: 1, order: 1 },
+        { atom1: 0, atom2: 2, order: 1 }
+      ]
+    },
+    methane: {
+      formula: "CH4",
+      atoms: [
+        { element: "C", x: 0, y: 0, z: 0 },
+        { element: "H", x: 1.09, y: 0, z: 0 },
+        { element: "H", x: -0.36, y: 1.03, z: 0 },
+        { element: "H", x: -0.36, y: -0.51, z: 0.89 },
+        { element: "H", x: -0.36, y: -0.51, z: -0.89 }
+      ],
+      bonds: [
+        { atom1: 0, atom2: 1, order: 1 },
+        { atom1: 0, atom2: 2, order: 1 },
+        { atom1: 0, atom2: 3, order: 1 },
+        { atom1: 0, atom2: 4, order: 1 }
+      ]
+    },
+    ammonia: {
+      formula: "NH3",
+      atoms: [
+        { element: "N", x: 0, y: 0, z: 0 },
+        { element: "H", x: 0.94, y: 0.38, z: 0 },
+        { element: "H", x: -0.94, y: 0.38, z: 0 },
+        { element: "H", x: 0, y: -0.75, z: 0 }
+      ],
+      bonds: [
+        { atom1: 0, atom2: 1, order: 1 },
+        { atom1: 0, atom2: 2, order: 1 },
+        { atom1: 0, atom2: 3, order: 1 }
+      ]
+    },
+    benzene: {
+      formula: "C6H6",
+      atoms: [
+        { element: "C", x: 1.39, y: 0, z: 0 },
+        { element: "C", x: 0.695, y: 1.204, z: 0 },
+        { element: "C", x: -0.695, y: 1.204, z: 0 },
+        { element: "C", x: -1.39, y: 0, z: 0 },
+        { element: "C", x: -0.695, y: -1.204, z: 0 },
+        { element: "C", x: 0.695, y: -1.204, z: 0 },
+        { element: "H", x: 2.47, y: 0, z: 0 },
+        { element: "H", x: 1.235, y: 2.14, z: 0 },
+        { element: "H", x: -1.235, y: 2.14, z: 0 },
+        { element: "H", x: -2.47, y: 0, z: 0 },
+        { element: "H", x: -1.235, y: -2.14, z: 0 },
+        { element: "H", x: 1.235, y: -2.14, z: 0 }
+      ],
+      bonds: [
+        { atom1: 0, atom2: 1, order: 2 },
+        { atom1: 1, atom2: 2, order: 1 },
+        { atom1: 2, atom2: 3, order: 2 },
+        { atom1: 3, atom2: 4, order: 1 },
+        { atom1: 4, atom2: 5, order: 2 },
+        { atom1: 5, atom2: 0, order: 1 },
+        { atom1: 0, atom2: 6, order: 1 },
+        { atom1: 1, atom2: 7, order: 1 },
+        { atom1: 2, atom2: 8, order: 1 },
+        { atom1: 3, atom2: 9, order: 1 },
+        { atom1: 4, atom2: 10, order: 1 },
+        { atom1: 5, atom2: 11, order: 1 }
+      ]
+    },
+    ethanol: {
+      formula: "C2H6O",
+      atoms: [
+        { element: "C", x: 0, y: 0, z: 0 },
+        { element: "C", x: 1.54, y: 0, z: 0 },
+        { element: "O", x: 2.04, y: 1.37, z: 0 },
+        { element: "H", x: -0.35, y: -0.52, z: 0.89 },
+        { element: "H", x: -0.35, y: -0.52, z: -0.89 },
+        { element: "H", x: -0.35, y: 1.03, z: 0 },
+        { element: "H", x: 1.89, y: -0.52, z: 0.89 },
+        { element: "H", x: 1.89, y: -0.52, z: -0.89 },
+        { element: "H", x: 2.99, y: 1.37, z: 0 }
+      ],
+      bonds: [
+        { atom1: 0, atom2: 1, order: 1 },
+        { atom1: 1, atom2: 2, order: 1 },
+        { atom1: 0, atom2: 3, order: 1 },
+        { atom1: 0, atom2: 4, order: 1 },
+        { atom1: 0, atom2: 5, order: 1 },
+        { atom1: 1, atom2: 6, order: 1 },
+        { atom1: 1, atom2: 7, order: 1 },
+        { atom1: 2, atom2: 8, order: 1 }
+      ]
+    },
+    caffeine: {
+      formula: "C8H10N4O2",
+      atoms: [
+        { element: "C", x: 0, y: 0, z: 0 },
+        { element: "N", x: 1.35, y: -0.78, z: 0 },
+        { element: "C", x: 2.31, y: 0.14, z: 0 },
+        { element: "N", x: 1.78, y: 1.42, z: 0 },
+        { element: "C", x: 0.41, y: 1.32, z: 0 },
+        { element: "C", x: -0.67, y: 2.18, z: 0 },
+        { element: "N", x: -1.85, y: 1.52, z: 0 },
+        { element: "C", x: -1.51, y: 0.21, z: 0 },
+        { element: "N", x: -2.35, y: -0.84, z: 0 },
+        { element: "O", x: 3.51, y: -0.08, z: 0 },
+        { element: "O", x: -0.65, y: 3.4, z: 0 },
+        { element: "C", x: 1.54, y: -2.22, z: 0 },
+        { element: "C", x: 2.54, y: 2.64, z: 0 },
+        { element: "C", x: -3.77, y: -0.72, z: 0 }
+      ],
+      bonds: [
+        { atom1: 0, atom2: 1, order: 1 },
+        { atom1: 1, atom2: 2, order: 1 },
+        { atom1: 2, atom2: 3, order: 1 },
+        { atom1: 3, atom2: 4, order: 1 },
+        { atom1: 4, atom2: 0, order: 2 },
+        { atom1: 4, atom2: 5, order: 1 },
+        { atom1: 5, atom2: 6, order: 1 },
+        { atom1: 6, atom2: 7, order: 2 },
+        { atom1: 7, atom2: 0, order: 1 },
+        { atom1: 7, atom2: 8, order: 1 },
+        { atom1: 2, atom2: 9, order: 2 },
+        { atom1: 5, atom2: 10, order: 2 },
+        { atom1: 1, atom2: 11, order: 1 },
+        { atom1: 3, atom2: 12, order: 1 },
+        { atom1: 8, atom2: 13, order: 1 }
+      ]
+    },
+    aspirin: {
+      formula: "C9H8O4",
+      atoms: [
+        { element: "C", x: 0, y: 0, z: 0 },
+        { element: "C", x: 1.39, y: 0, z: 0 },
+        { element: "C", x: 2.08, y: 1.21, z: 0 },
+        { element: "C", x: 1.39, y: 2.42, z: 0 },
+        { element: "C", x: 0, y: 2.42, z: 0 },
+        { element: "C", x: -0.69, y: 1.21, z: 0 },
+        { element: "O", x: 2.08, y: -1.21, z: 0 },
+        { element: "C", x: 3.48, y: -1.21, z: 0 },
+        { element: "O", x: 4.17, y: -2.42, z: 0 },
+        { element: "C", x: 4.17, y: 0, z: 0 },
+        { element: "O", x: 5.57, y: 0, z: 0 },
+        { element: "O", x: -0.69, y: 3.63, z: 0 }
+      ],
+      bonds: [
+        { atom1: 0, atom2: 1, order: 2 },
+        { atom1: 1, atom2: 2, order: 1 },
+        { atom1: 2, atom2: 3, order: 2 },
+        { atom1: 3, atom2: 4, order: 1 },
+        { atom1: 4, atom2: 5, order: 2 },
+        { atom1: 5, atom2: 0, order: 1 },
+        { atom1: 1, atom2: 6, order: 1 },
+        { atom1: 6, atom2: 7, order: 1 },
+        { atom1: 7, atom2: 8, order: 2 },
+        { atom1: 7, atom2: 9, order: 1 },
+        { atom1: 9, atom2: 10, order: 1 },
+        { atom1: 4, atom2: 11, order: 1 }
+      ]
+    },
+    glucose: {
+      formula: "C6H12O6",
+      atoms: [
+        { element: "C", x: 0, y: 0, z: 0 },
+        { element: "C", x: 1.54, y: 0, z: 0 },
+        { element: "C", x: 2.24, y: 1.33, z: 0 },
+        { element: "C", x: 1.54, y: 2.66, z: 0 },
+        { element: "C", x: 0, y: 2.66, z: 0 },
+        { element: "O", x: -0.7, y: 1.33, z: 0 },
+        { element: "O", x: -0.7, y: -1.33, z: 0 },
+        { element: "O", x: 2.24, y: -1.33, z: 0 },
+        { element: "O", x: 3.64, y: 1.33, z: 0 },
+        { element: "O", x: 2.24, y: 3.99, z: 0 },
+        { element: "O", x: -0.7, y: 3.99, z: 0 },
+        { element: "C", x: -0.35, y: -2.66, z: 0 }
+      ],
+      bonds: [
+        { atom1: 0, atom2: 1, order: 1 },
+        { atom1: 1, atom2: 2, order: 1 },
+        { atom1: 2, atom2: 3, order: 1 },
+        { atom1: 3, atom2: 4, order: 1 },
+        { atom1: 4, atom2: 5, order: 1 },
+        { atom1: 5, atom2: 0, order: 1 },
+        { atom1: 0, atom2: 6, order: 1 },
+        { atom1: 1, atom2: 7, order: 1 },
+        { atom1: 2, atom2: 8, order: 1 },
+        { atom1: 3, atom2: 9, order: 1 },
+        { atom1: 4, atom2: 10, order: 1 },
+        { atom1: 6, atom2: 11, order: 1 }
+      ]
+    }
+  };
+
   const fetchMoleculeData = async (name) => {
     try {
       setIsLoading(true);
       setError('');
       
-      console.log('Fetching data for:', name); // Debug log
+      console.log('Fetching data for:', name);
       
-      const response = await fetch("/api/molecule", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          moleculeName: name
-        })
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || `API request failed: ${response.status}`);
-      }
-
-      const moleculeInfo = await response.json();
-      console.log('API response:', moleculeInfo); // Debug log
+      // Simulate API delay for realistic UX
+      await new Promise(resolve => setTimeout(resolve, 1500));
       
-      if (moleculeInfo.error) {
-        setError(moleculeInfo.error);
-        setMoleculeData(null);
-      } else {
-        setMoleculeData(moleculeInfo);
+      const normalizedName = name.toLowerCase().trim();
+      const moleculeData = moleculeDatabase[normalizedName];
+      
+      if (moleculeData) {
+        setMoleculeData(moleculeData);
         setError('');
+      } else {
+        const availableMolecules = Object.keys(moleculeDatabase).join(', ');
+        setError(`Molecule "${name}" not found. Available molecules: ${availableMolecules}`);
+        setMoleculeData(null);
       }
     } catch (error) {
-      console.error('Error fetching molecule data:', error);
-      setError(`Failed to fetch molecule data: ${error.message}. Please try again.`);
+      console.error('Error:', error);
+      setError('Something went wrong. Please try again.');
       setMoleculeData(null);
     } finally {
       setIsLoading(false);
@@ -327,7 +515,7 @@ const MoleculeStudio = () => {
               value={moleculeName}
               onChange={(e) => setMoleculeName(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Enter molecule name (e.g., water, caffeine, aspirin)"
+              placeholder="Try: water, methane, ammonia, benzene, caffeine, aspirin, ethanol, glucose"
               className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               disabled={isLoading}
             />
